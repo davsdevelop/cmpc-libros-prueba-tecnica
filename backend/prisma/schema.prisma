@@ -1,0 +1,59 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "windows", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Book {
+  id           Int       @id @default(autoincrement())
+  title        String
+  price        Float
+  availability Boolean   @default(true)
+  imageUrl     String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  authorId     Int
+  author       Author    @relation(fields: [authorId], references: [id])
+  editorialId  Int
+  editorial    Editorial @relation(fields: [editorialId], references: [id])
+  genreId      Int
+  genre        Genre     @relation(fields: [genreId], references: [id])
+
+  @@index([title])
+  @@index([authorId])
+  @@index([editorialId])
+  @@index([genreId])
+}
+
+model Author {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  books     Book[]
+}
+
+model Editorial {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  books     Book[]
+}
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  books     Book[]
+}
